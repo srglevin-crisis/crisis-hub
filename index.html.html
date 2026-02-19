@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Philadelphia Crisis Resource Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --teal: #0d7377; --teal-light: #14a085; --teal-pale: #e8f5f4; --teal-dark: #084c50;
+    --sand: #f7f3ee; --sand-dark: #ede8e0; --rust: #c4553a; --rust-light: #e8705a;
+    --amber: #d4882a; --text: #1a1a1a; --text-muted: #6b7280;
+    --border: #ddd8d0; --shadow: 0 2px 12px rgba(0,0,0,0.08); --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+
+  header { background: var(--teal-dark); color: white; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 36px; height: 36px; background: var(--teal-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { font-family: 'DM Serif Display', serif; font-size: 1.3rem; letter-spacing: -0.02em; }
+  .logo-sub { font-size: 0.7rem; opacity: 0.7; font-weight: 300; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-top: -4px; }
+
+  nav { background: white; border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; overflow-x: auto; }
+  .tab-btn { padding: 14px 20px; border: none; background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; color: var(--text-muted); border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .tab-btn:hover { color: var(--teal); }
+  .tab-btn.active { color: var(--teal-dark); border-bottom-color: var(--teal); }
+  .badge { background: var(--rust); color: white; border-radius: 20px; padding: 1px 7px; font-size: 0.72rem; font-weight: 600; }
+  .badge.amber { background: var(--amber); }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .search-hero { background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 100%); border-radius: var(--radius); padding: 2.5rem 2rem; margin-bottom: 1.5rem; color: white; position: relative; overflow: hidden; }
+  .search-hero::before { content: ''; position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .search-hero h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; margin-bottom: 0.4rem; position: relative; }
+  .search-hero p { opacity: 0.85; font-size: 0.95rem; margin-bottom: 1.2rem; position: relative; }
+  .search-row { display: flex; gap: 10px; }
+  .search-input { flex: 1; padding: 13px 18px; border-radius: var(--radius-sm); border: none; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+
+  .btn { padding: 12px 22px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; }
+  .btn-primary { background: var(--teal-light); color: white; } .btn-primary:hover { background: #12b090; transform: translateY(-1px); }
+  .btn-secondary { background: white; color: var(--teal-dark); } .btn-secondary:hover { background: var(--teal-pale); }
+  .btn-danger { background: var(--rust); color: white; } .btn-danger:hover { background: var(--rust-light); }
+  .btn-amber { background: var(--amber); color: white; } .btn-amber:hover { filter: brightness(1.1); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); } .btn-ghost:hover { background: var(--sand-dark); color: var(--text); }
+  .btn-sm { padding: 7px 14px; font-size: 0.82rem; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+  .filter-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; margin-right: 4px; }
+  .filter-chip { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-size: 0.82rem; font-weight: 500; color: var(--text-muted); transition: all 0.15s; }
+  .filter-chip:hover, .filter-chip.active { background: var(--teal-pale); border-color: var(--teal); color: var(--teal-dark); }
+
+  .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+  .resource-card { background: white; border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); border: 1px solid var(--border); transition: box-shadow 0.2s, transform 0.2s; cursor: pointer; }
+  .resource-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+  .resource-card.stale { border-left: 4px solid var(--amber); }
+  .card-type-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .type-hotline { background: #fce4e0; color: #a33; }
+  .type-website { background: #e0eeff; color: #1a5fa8; }
+  .type-location { background: #e6f4e8; color: #2a7a3a; }
+  .type-document { background: #f0eaff; color: #6030a0; }
+  .county-pill { display: inline-block; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); background: var(--sand-dark); padding: 2px 8px; border-radius: 20px; margin-left: 5px; }
+  .card-title { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 0.4rem; }
+  .card-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 0.8rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.8rem; }
+  .tag { padding: 3px 9px; background: var(--teal-pale); color: var(--teal-dark); border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+  .card-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--sand-dark); padding-top: 0.7rem; }
+  .stale-warning { display: flex; align-items: center; gap: 5px; color: var(--amber); font-size: 0.78rem; font-weight: 600; margin-top: 0.5rem; }
+  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); grid-column: 1/-1; }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-state h3 { font-family: 'DM Serif Display', serif; color: var(--text); margin-bottom: 0.5rem; }
+  .loading-state { text-align: center; padding: 3rem; color: var(--text-muted); grid-column: 1/-1; }
+  .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .form-card { background: white; border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); border: 1px solid var(--border); max-width: 680px; margin: 0 auto; }
+  .form-card h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; margin-bottom: 0.3rem; }
+  .form-card .subtitle { color: var(--text-muted); margin-bottom: 1.8rem; font-size: 0.9rem; }
+  .form-group { margin-bottom: 1.2rem; }
+  label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.4rem; }
+  label .req { color: var(--rust); }
+  input[type="text"], input[type="tel"], input[type="url"], textarea, select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text); background: white; outline: none; transition: border-color 0.2s; }
+  input:focus, textarea:focus, select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,115,119,0.1); }
+  textarea { resize: vertical; min-height: 100px; }
+  .type-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 1.2rem; }
+  .type-option { border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 12px; cursor: pointer; text-align: center; transition: all 0.15s; background: white; }
+  .type-option:hover { border-color: var(--teal); }
+  .type-option.selected { border-color: var(--teal); background: var(--teal-pale); }
+  .type-option .type-icon { font-size: 1.5rem; margin-bottom: 4px; }
+  .type-option .type-name { font-size: 0.82rem; font-weight: 600; }
+  .tags-input-container { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: text; background: white; min-height: 44px; align-items: center; transition: border-color 0.2s; }
+  .tags-input-container:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,115,119,0.1); }
+  .tag-item { background: var(--teal-pale); color: var(--teal-dark); padding: 3px 8px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; }
+  .tag-item .remove { cursor: pointer; font-size: 0.9rem; line-height: 1; opacity: 0.7; }
+  .tag-item .remove:hover { opacity: 1; }
+  .tags-input-container input { border: none; outline: none; padding: 2px 4px; font-size: 0.88rem; flex: 1; min-width: 100px; box-shadow: none; }
+  .file-drop { border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 2rem; text-align: center; color: var(--text-muted); cursor: pointer; transition: all 0.2s; background: var(--sand); }
+  .file-drop:hover, .file-drop.dragover { border-color: var(--teal); background: var(--teal-pale); color: var(--teal-dark); }
+  .file-drop .drop-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .file-drop input { display: none; }
+  .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
+  .success-message { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: var(--radius-sm); padding: 1rem 1.2rem; color: #2e7d32; font-size: 0.9rem; display: none; margin-top: 1rem; }
+  .error-message { background: #fce4e0; border: 1px solid #f5a59a; border-radius: var(--radius-sm); padding: 1rem 1.2rem; color: #a33; font-size: 0.9rem; display: none; margin-top: 1rem; }
+
+  .admin-lock { max-width: 400px; margin: 3rem auto; background: white; border-radius: var(--radius); padding: 2.5rem; text-align: center; box-shadow: var(--shadow); }
+  .admin-lock .lock-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .admin-lock h2 { font-family: 'DM Serif Display', serif; margin-bottom: 0.5rem; }
+  .admin-lock p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+  .admin-content { display: none; }
+  .admin-content.unlocked { display: block; }
+  .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card { background: white; border-radius: var(--radius-sm); padding: 1rem 1.2rem; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .stat-number { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--teal-dark); line-height: 1; }
+  .stat-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
+  .review-section { margin-bottom: 2.5rem; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+  .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+  .review-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 0.8rem; box-shadow: var(--shadow); }
+  .review-card.stale-review { border-left: 4px solid var(--amber); }
+  .review-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.6rem; }
+  .review-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: white; border-radius: var(--radius); padding: 2rem; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+  .modal h3 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-bottom: 1rem; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.5rem; }
+  .detail-row { display: flex; gap: 1rem; margin-bottom: 0.5rem; font-size: 0.88rem; }
+  .detail-label { font-weight: 600; color: var(--text-muted); min-width: 90px; flex-shrink: 0; }
+
+  @media (max-width: 640px) {
+    main { padding: 1rem; }
+    .resources-grid { grid-template-columns: 1fr; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .tab-btn { padding: 14px 12px; font-size: 0.82rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🫂</div>
+    <div>
+      <span class="logo-text">Crisis Resource Hub</span>
+      <span class="logo-sub">Philadelphia Region · 988 Support Network</span>
+    </div>
+  </div>
+  <div style="font-size:0.82rem;color:rgba(255,255,255,0.6);">Community Resource Database</div>
+</header>
+
+<nav>
+  <button class="tab-btn active" onclick="switchTab('search',this)">🔍 Search Resources</button>
+  <button class="tab-btn" onclick="switchTab('submit',this)">➕ Submit a Resource</button>
+  <button class="tab-btn" onclick="switchTab('admin',this)">🔒 Admin Review <span class="badge" id="pending-badge" style="display:none">0</span></button>
+</nav>
+
+<main>
+
+  <!-- SEARCH PANEL -->
+  <div id="panel-search" class="panel active">
+    <div class="search-hero">
+      <h1>Find Crisis Resources</h1>
+      <p>Verified hotlines, services, and organizations serving Philadelphia and surrounding counties.</p>
+      <div class="search-row">
+        <input type="text" class="search-input" id="search-input" placeholder="Search by keyword, topic, or service name..." oninput="debounceSearch()">
+        <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <span class="filter-label">Type:</span>
+      <button class="filter-chip active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-chip" onclick="setFilter('hotline',this)">📞 Hotlines</button>
+      <button class="filter-chip" onclick="setFilter('website',this)">🌐 Websites</button>
+      <button class="filter-chip" onclick="setFilter('location',this)">📍 Locations</button>
+      <button class="filter-chip" onclick="setFilter('document',this)">📄 Documents</button>
+    </div>
+
+    <div class="filters">
+      <span class="filter-label">County:</span>
+      <button class="filter-chip county-chip active" onclick="setCounty('all',this)">All Areas</button>
+      <button class="filter-chip county-chip" onclick="setCounty('Philadelphia',this)">🏙️ Philadelphia</button>
+      <button class="filter-chip county-chip" onclick="setCounty('Bucks',this)">Bucks</button>
+      <button class="filter-chip county-chip" onclick="setCounty('Chester',this)">Chester</button>
+      <button class="filter-chip county-chip" onclick="setCounty('Delaware',this)">Delaware</button>
+      <button class="filter-chip county-chip" onclick="setCounty('Montgomery',this)">Montgomery</button>
+      <button class="filter-chip county-chip" onclick="setCounty('Regional',this)">🌐 Regional</button>
+    </div>
+
+    <div class="resources-grid" id="resources-grid">
+      <div class="loading-state"><div class="spinner"></div><br><br>Loading resources...</div>
+    </div>
+  </div>
+
+  <!-- SUBMIT PANEL -->
+  <div id="panel-submit" class="panel">
+    <div class="form-card">
+      <h2>Submit a Resource</h2>
+      <p class="subtitle">Share a resource with our community. All submissions are reviewed before being published.</p>
+
+      <div class="form-group">
+        <label>Resource Type <span class="req">*</span></label>
+        <div class="type-selector">
+          <div class="type-option selected" onclick="selectType(this,'hotline')"><div class="type-icon">📞</div><div class="type-name">Hotline / Phone</div></div>
+          <div class="type-option" onclick="selectType(this,'website')"><div class="type-icon">🌐</div><div class="type-name">Website / Link</div></div>
+          <div class="type-option" onclick="selectType(this,'location')"><div class="type-icon">📍</div><div class="type-name">Physical Location</div></div>
+          <div class="type-option" onclick="selectType(this,'document')"><div class="type-icon">📄</div><div class="type-name">Flyer / Document</div></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="res-name">Resource Name <span class="req">*</span></label>
+        <input type="text" id="res-name" placeholder="e.g. 988 Suicide & Crisis Lifeline">
+      </div>
+
+      <div class="form-group">
+        <label for="res-org">Organization</label>
+        <input type="text" id="res-org" placeholder="e.g. SAMHSA">
+      </div>
+
+      <div class="form-group">
+        <label for="res-county">County / Area Served <span class="req">*</span></label>
+        <select id="res-county">
+          <option value="">— Select primary area —</option>
+          <option value="Philadelphia">Philadelphia</option>
+          <option value="Bucks">Bucks County</option>
+          <option value="Chester">Chester County</option>
+          <option value="Delaware">Delaware County</option>
+          <option value="Montgomery">Montgomery County</option>
+          <option value="Regional">Regional / Statewide (serves all areas)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="res-desc">Description <span class="req">*</span></label>
+        <textarea id="res-desc" placeholder="Briefly describe what this resource offers and who it serves..."></textarea>
+      </div>
+
+      <div class="form-group" id="phone-field">
+        <label for="res-phone">Phone Number</label>
+        <input type="tel" id="res-phone" placeholder="e.g. 988 or (215) 555-0100">
+      </div>
+      <div class="form-group" id="url-field" style="display:none">
+        <label for="res-url">Website URL</label>
+        <input type="url" id="res-url" placeholder="https://...">
+      </div>
+      <div class="form-group" id="address-field" style="display:none">
+        <label for="res-address">Address</label>
+        <input type="text" id="res-address" placeholder="123 Main St, Philadelphia, PA 19103">
+      </div>
+      <div class="form-group" id="file-field" style="display:none">
+        <label>Upload File</label>
+        <div class="file-drop" id="file-drop" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+          <div class="drop-icon">📎</div>
+          <div style="font-weight:600;margin-bottom:4px;">Drop file here or click to browse</div>
+          <div style="font-size:0.8rem;">PDF, PNG, JPG up to 10MB</div>
+          <input type="file" id="file-input" accept=".pdf,.png,.jpg,.jpeg" onchange="handleFileSelect(event)">
+        </div>
+        <div id="file-name" style="font-size:0.82rem;color:var(--teal-dark);margin-top:6px;display:none;"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Keywords / Tags</label>
+        <div class="tags-input-container" onclick="document.getElementById('tag-input').focus()">
+          <div id="tags-container"></div>
+          <input type="text" id="tag-input" placeholder="Type a tag and press Enter..." onkeydown="handleTagInput(event)">
+        </div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">Suggested: mental health, substance use, housing, youth, veteran, crisis, grief, domestic violence</div>
+      </div>
+
+      <div class="form-group">
+        <label for="res-submitter">Your Name / Contact (optional)</label>
+        <input type="text" id="res-submitter" placeholder="e.g. Jane Doe, Community Outreach">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
+        <button class="btn btn-primary" id="submit-btn" onclick="submitResource()">Submit for Review →</button>
+      </div>
+      <div class="success-message" id="submit-success">✅ <strong>Thank you!</strong> Your resource has been submitted and will be reviewed by our team. Once approved, it will appear in the database.</div>
+      <div class="error-message" id="submit-error"></div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="panel-admin" class="panel">
+    <div class="admin-lock" id="admin-lock">
+      <div class="lock-icon">🔐</div>
+      <h2>Admin Access</h2>
+      <p>This area is for authorized reviewers only. Enter the admin password to continue.</p>
+      <div class="form-group">
+        <input type="password" id="admin-password" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkPassword()" style="text-align:center;letter-spacing:0.15em;">
+      </div>
+      <button class="btn btn-primary" onclick="checkPassword()" style="width:100%;margin-top:8px;">Unlock →</button>
+      <div id="password-error" style="color:var(--rust);font-size:0.82rem;margin-top:8px;display:none;">Incorrect password. Try again.</div>
+    </div>
+
+    <div class="admin-content" id="admin-content">
+      <div class="stats-bar" id="admin-stats">
+        <div class="stat-card"><div class="stat-number">—</div><div class="stat-label">Approved</div></div>
+        <div class="stat-card"><div class="stat-number">—</div><div class="stat-label">Pending Review</div></div>
+        <div class="stat-card"><div class="stat-number">—</div><div class="stat-label">Need Refresh</div></div>
+        <div class="stat-card"><div class="stat-number">—</div><div class="stat-label">Total</div></div>
+      </div>
+
+      <div class="review-section">
+        <div class="section-header"><div class="section-title">📬 Pending Review <span class="badge" id="pending-count-badge">0</span></div></div>
+        <div id="pending-list"><div class="loading-state"><div class="spinner"></div></div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="review-section">
+        <div class="section-header"><div class="section-title">⏰ Needs Refresh <span class="badge amber" id="stale-count-badge">0</span></div></div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1rem;">These resources were approved more than 6 months ago and should be verified for accuracy.</p>
+        <div id="stale-list"><div class="loading-state"><div class="spinner"></div></div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="review-section">
+        <div class="section-header"><div class="section-title">✅ Approved Resources</div></div>
+        <div id="approved-list"><div class="loading-state"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+const SUPABASE_URL = 'https://mkkhiocmzprlhiwyirii.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ra2hpb2NtenBybGhpd3lpcmlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0OTk4NzIsImV4cCI6MjA4NzA3NTg3Mn0.wXl72qHcR1Rru8beHd9jGTBJURBs46QMbw9N2SttinQ';
+const ADMIN_PASSWORD = 'admin123'; // ⚠️ CHANGE THIS before going live!
+const STALE_DAYS = 183;
+
+const BASE_HEADERS = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': `Bearer ${SUPABASE_KEY}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
+
+async function db(method, path, body = null) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    method, headers: BASE_HEADERS,
+    body: body ? JSON.stringify(body) : null,
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const t = await res.text();
+  return t ? JSON.parse(t) : null;
+}
+
+// ── STATE ───────────────────────────────────────────────────
+let currentFilter = 'all';
+let currentCounty = 'all';
+let currentTags = [];
+let selectedType = 'hotline';
+let allApproved = [];
+let searchTimer = null;
+
+// ── TABS ────────────────────────────────────────────────────
+function switchTab(tab, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── SEARCH ──────────────────────────────────────────────────
+async function loadApproved() {
+  try {
+    const data = await db('GET', 'resources?status=eq.approved&order=approved_at.desc');
+    allApproved = data || [];
+    renderSearch();
+    updatePendingBadge();
+  } catch(e) {
+    document.getElementById('resources-grid').innerHTML =
+      `<div class="empty-state"><div class="icon">⚠️</div><h3>Could not load resources</h3><p>${escHtml(e.message)}</p></div>`;
+  }
+}
+
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(renderSearch, 200);
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  renderSearch();
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip:not(.county-chip)').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderSearch();
+}
+
+function setCounty(c, el) {
+  currentCounty = c;
+  document.querySelectorAll('.county-chip').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  renderSearch();
+}
+
+function renderSearch() {
+  const query = document.getElementById('search-input').value.toLowerCase().trim();
+  const STALE_MS = STALE_DAYS * 86400000;
+  const now = Date.now();
+  const grid = document.getElementById('resources-grid');
+
+  const resources = allApproved.filter(r => {
+    if (currentFilter !== 'all' && r.type !== currentFilter) return false;
+    if (currentCounty !== 'all' && r.county !== currentCounty && r.county !== 'Regional') return false;
+    if (!query) return true;
+    return [r.name, r.org, r.description, r.county, ...(r.tags||[]), r.phone, r.url, r.address]
+      .filter(Boolean).join(' ').toLowerCase().includes(query);
+  });
+
+  if (resources.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>No resources found</h3><p>Try different keywords or clear the filters.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = resources.map(r => {
+    const isStale = r.approved_at && (now - new Date(r.approved_at).getTime()) > STALE_MS;
+    const ti = typeInfo(r.type);
+    return `<div class="resource-card${isStale?' stale':''}" onclick="showDetail('${r.id}')">
+      <div><span class="card-type-badge type-${r.type}">${ti.icon} ${ti.label}</span>${r.county?`<span class="county-pill">📍 ${escHtml(r.county)}</span>`:''}</div>
+      <div class="card-title">${escHtml(r.name)}</div>
+      ${r.org?`<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.4rem;font-weight:500;">${escHtml(r.org)}</div>`:''}
+      <div class="card-desc">${escHtml(r.description)}</div>
+      <div class="card-tags">${(r.tags||[]).map(t=>`<span class="tag">${escHtml(t)}</span>`).join('')}</div>
+      ${isStale?`<div class="stale-warning">⏰ Review recommended — approved ${timeAgo(r.approved_at)}</div>`:''}
+      <div class="card-meta"><span>${contactSummary(r)}</span><span>${timeAgo(r.approved_at||r.created_at)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function showDetail(id) {
+  const r = allApproved.find(x => x.id === id);
+  if (!r) return;
+  const ti = typeInfo(r.type);
+  const isStale = r.approved_at && (Date.now() - new Date(r.approved_at).getTime()) > STALE_DAYS * 86400000;
+  document.getElementById('modal-content').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:1rem;">
+      <span class="card-type-badge type-${r.type}">${ti.icon} ${ti.label}</span>
+      <button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted);">×</button>
+    </div>
+    <h3>${escHtml(r.name)}</h3>
+    ${r.org?`<div style="color:var(--text-muted);font-weight:500;margin-bottom:0.3rem;">${escHtml(r.org)}</div>`:''}
+    ${r.county?`<span class="county-pill" style="display:inline-block;margin-bottom:1rem;">📍 ${escHtml(r.county)}</span>`:''}
+    ${isStale?`<div class="stale-warning" style="margin-bottom:1rem;">⏰ This resource is over 6 months old — verify accuracy before using.</div>`:''}
+    <p style="margin-bottom:1.2rem;line-height:1.65;">${escHtml(r.description)}</p>
+    ${r.phone?`<div class="detail-row"><span class="detail-label">Phone</span><a href="tel:${r.phone}" style="color:var(--teal-dark);font-weight:600;">${escHtml(r.phone)}</a></div>`:''}
+    ${r.url?`<div class="detail-row"><span class="detail-label">Website</span><a href="${escHtml(r.url)}" target="_blank" rel="noopener" style="color:var(--teal-dark);">${escHtml(r.url)}</a></div>`:''}
+    ${r.address?`<div class="detail-row"><span class="detail-label">Address</span><span>${escHtml(r.address)}</span></div>`:''}
+    ${(r.tags||[]).length?`<div class="detail-row" style="margin-top:0.5rem;"><span class="detail-label">Tags</span><div style="display:flex;flex-wrap:wrap;gap:5px;">${r.tags.map(t=>`<span class="tag">${escHtml(t)}</span>`).join('')}</div></div>`:''}
+    <div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeModal()">Close</button></div>`;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('detail-modal').classList.remove('open'); }
+document.getElementById('detail-modal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal(); });
+
+// ── SUBMIT ──────────────────────────────────────────────────
+function selectType(el, type) {
+  document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedType = type;
+  document.getElementById('phone-field').style.display = type==='hotline' ? 'block' : 'none';
+  document.getElementById('url-field').style.display = type==='website' ? 'block' : 'none';
+  document.getElementById('address-field').style.display = type==='location' ? 'block' : 'none';
+  document.getElementById('file-field').style.display = type==='document' ? 'block' : 'none';
+}
+
+function handleTagInput(e) {
+  if (e.key==='Enter' || e.key===',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,$/,'');
+    if (val && !currentTags.includes(val)) { currentTags.push(val); renderTagsInput(); }
+    e.target.value = '';
+  }
+  if (e.key==='Backspace' && !e.target.value && currentTags.length) { currentTags.pop(); renderTagsInput(); }
+}
+
+function renderTagsInput() {
+  document.getElementById('tags-container').innerHTML = currentTags.map((t,i) =>
+    `<span class="tag-item">${escHtml(t)} <span class="remove" onclick="removeTag(${i})">×</span></span>`
+  ).join('');
+}
+function removeTag(i) { currentTags.splice(i,1); renderTagsInput(); }
+
+let selectedFile = null;
+function handleFileSelect(e) { setFile(e.target.files[0]); }
+function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+function handleDrop(e) { e.preventDefault(); e.currentTarget.classList.remove('dragover'); setFile(e.dataTransfer.files[0]); }
+function setFile(f) {
+  if (!f) return;
+  selectedFile = f;
+  document.getElementById('file-name').style.display = 'block';
+  document.getElementById('file-name').textContent = '📎 ' + f.name;
+}
+
+async function submitResource() {
+  const name = document.getElementById('res-name').value.trim();
+  const desc = document.getElementById('res-desc').value.trim();
+  const county = document.getElementById('res-county').value;
+  if (!name || !desc) { alert('Please fill in the resource name and description.'); return; }
+  if (!county) { alert('Please select a county / area served.'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  document.getElementById('submit-success').style.display = 'none';
+  document.getElementById('submit-error').style.display = 'none';
+
+  try {
+    await db('POST', 'resources', {
+      name, org: document.getElementById('res-org').value.trim()||null,
+      type: selectedType, county, description: desc,
+      phone: document.getElementById('res-phone').value.trim()||null,
+      url: document.getElementById('res-url').value.trim()||null,
+      address: document.getElementById('res-address').value.trim()||null,
+      file_name: selectedFile ? selectedFile.name : null,
+      tags: currentTags.length ? currentTags : null,
+      submitter: document.getElementById('res-submitter').value.trim()||'Anonymous',
+      status: 'pending',
+    });
+    document.getElementById('submit-success').style.display = 'block';
+    clearForm();
+    updatePendingBadge();
+  } catch(e) {
+    const errEl = document.getElementById('submit-error');
+    errEl.style.display = 'block';
+    errEl.textContent = '⚠️ Submission failed: ' + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit for Review →';
+  }
+}
+
+function clearForm() {
+  ['res-name','res-org','res-desc','res-phone','res-url','res-address','res-submitter','tag-input'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('res-county').value = '';
+  currentTags = []; renderTagsInput();
+  selectedFile = null;
+  document.getElementById('file-name').style.display = 'none';
+}
+
+// ── ADMIN ───────────────────────────────────────────────────
+function checkPassword() {
+  if (document.getElementById('admin-password').value === ADMIN_PASSWORD) {
+    document.getElementById('admin-lock').style.display = 'none';
+    document.getElementById('admin-content').classList.add('unlocked');
+    loadAdminData();
+  } else {
+    document.getElementById('password-error').style.display = 'block';
+  }
+}
+
+async function loadAdminData() {
+  try {
+    // Fetch all resources — works because our RLS policy allows anon to do everything
+    // (If you tighten RLS later, you'd use a Supabase Edge Function here instead)
+    const all = await db('GET', 'resources?order=created_at.desc');
+    const now = Date.now();
+    const STALE_MS = STALE_DAYS * 86400000;
+    const approved = (all||[]).filter(r => r.status==='approved');
+    const pending = (all||[]).filter(r => r.status==='pending');
+    const stale = approved.filter(r => r.approved_at && (now-new Date(r.approved_at).getTime())>STALE_MS);
+    const fresh = approved.filter(r => !(r.approved_at && (now-new Date(r.approved_at).getTime())>STALE_MS));
+
+    document.getElementById('admin-stats').innerHTML = `
+      <div class="stat-card"><div class="stat-number">${approved.length}</div><div class="stat-label">Approved</div></div>
+      <div class="stat-card"><div class="stat-number">${pending.length}</div><div class="stat-label">Pending Review</div></div>
+      <div class="stat-card"><div class="stat-number" style="color:var(--amber);">${stale.length}</div><div class="stat-label">Need Refresh</div></div>
+      <div class="stat-card"><div class="stat-number" style="color:var(--teal-light);">${(all||[]).length}</div><div class="stat-label">Total</div></div>`;
+
+    document.getElementById('pending-count-badge').textContent = pending.length;
+    document.getElementById('pending-list').innerHTML = pending.length
+      ? pending.map(r => reviewCard(r,'pending')).join('')
+      : `<div class="empty-state"><div class="icon">✨</div><h3>All clear!</h3><p>No resources awaiting review.</p></div>`;
+
+    document.getElementById('stale-count-badge').textContent = stale.length;
+    document.getElementById('stale-list').innerHTML = stale.length
+      ? stale.map(r => reviewCard(r,'stale')).join('')
+      : `<div class="empty-state"><div class="icon">🎉</div><h3>All up to date!</h3><p>No resources need refreshing.</p></div>`;
+
+    document.getElementById('approved-list').innerHTML = fresh.length
+      ? fresh.map(r => reviewCard(r,'approved')).join('')
+      : `<div class="empty-state"><div class="icon">📋</div><h3>No approved resources yet.</h3></div>`;
+
+  } catch(e) {
+    document.getElementById('pending-list').innerHTML =
+      `<div class="empty-state"><div class="icon">⚠️</div><h3>Error loading data</h3><p>${escHtml(e.message)}</p></div>`;
+  }
+}
+
+function reviewCard(r, context) {
+  const ti = typeInfo(r.type);
+  const isStale = context==='stale';
+  let actions = '';
+  if (context==='pending') actions = `<button class="btn btn-primary btn-sm" onclick="approveResource('${r.id}')">✓ Approve</button><button class="btn btn-danger btn-sm" onclick="deleteResource('${r.id}')">✗ Reject</button>`;
+  else if (context==='stale') actions = `<button class="btn btn-amber btn-sm" onclick="reapproveResource('${r.id}')">✓ Re-approve</button><button class="btn btn-danger btn-sm" onclick="deleteResource('${r.id}')">Delete</button>`;
+  else actions = `<button class="btn btn-ghost btn-sm" onclick="deleteResource('${r.id}')">Delete</button>`;
+
+  return `<div class="review-card${isStale?' stale-review':''}">
+    <div class="review-card-header">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span class="card-type-badge type-${r.type}" style="margin:0;">${ti.icon} ${ti.label}</span>
+          ${r.county?`<span class="county-pill" style="margin:0;">📍 ${escHtml(r.county)}</span>`:''}
+          ${isStale?`<span style="font-size:0.75rem;color:var(--amber);font-weight:600;">⏰ Needs refresh</span>`:''}
+        </div>
+        <div style="font-weight:600;font-size:1rem;">${escHtml(r.name)}</div>
+        ${r.org?`<div style="font-size:0.82rem;color:var(--text-muted);">${escHtml(r.org)}</div>`:''}
+      </div>
+      <div class="review-actions">${actions}</div>
+    </div>
+    <div style="font-size:0.88rem;color:var(--text-muted);margin-bottom:0.5rem;line-height:1.5;">${escHtml(r.description)}</div>
+    ${r.phone?`<div style="font-size:0.82rem;">📞 ${escHtml(r.phone)}</div>`:''}
+    ${r.url?`<div style="font-size:0.82rem;">🌐 ${escHtml(r.url)}</div>`:''}
+    ${r.address?`<div style="font-size:0.82rem;">📍 ${escHtml(r.address)}</div>`:''}
+    ${r.file_name?`<div style="font-size:0.82rem;">📎 ${escHtml(r.file_name)}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:0.5rem;">${(r.tags||[]).map(t=>`<span class="tag">${escHtml(t)}</span>`).join('')}</div>
+    <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.7rem;border-top:1px solid var(--sand-dark);padding-top:0.5rem;">
+      Submitted by ${escHtml(r.submitter||'Anonymous')} · ${timeAgo(r.created_at)}
+      ${r.approved_at?' · Approved '+timeAgo(r.approved_at):''}
+    </div>
+  </div>`;
+}
+
+async function approveResource(id) {
+  try {
+    await db('PATCH', `resources?id=eq.${id}`, { status:'approved', approved_at: new Date().toISOString() });
+    await loadApproved(); await loadAdminData();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function reapproveResource(id) {
+  try {
+    await db('PATCH', `resources?id=eq.${id}`, { approved_at: new Date().toISOString() });
+    await loadApproved(); await loadAdminData();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteResource(id) {
+  if (!confirm('Delete this resource? This cannot be undone.')) return;
+  try {
+    await db('DELETE', `resources?id=eq.${id}`);
+    await loadApproved(); await loadAdminData();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function updatePendingBadge() {
+  try {
+    const p = await db('GET', 'resources?status=eq.pending&select=id');
+    const n = (p||[]).length;
+    const badge = document.getElementById('pending-badge');
+    badge.textContent = n;
+    badge.style.display = n > 0 ? '' : 'none';
+  } catch(e) {}
+}
+
+// ── UTILS ───────────────────────────────────────────────────
+function typeInfo(type) {
+  return ({hotline:{icon:'📞',label:'Hotline'},website:{icon:'🌐',label:'Website'},location:{icon:'📍',label:'Location'},document:{icon:'📄',label:'Document'}})[type]||{icon:'📋',label:'Resource'};
+}
+function contactSummary(r) {
+  if (r.phone) return `📞 ${r.phone}`;
+  if (r.url) return `🔗 ${r.url.replace('https://','').split('/')[0]}`;
+  if (r.address) return `📍 ${r.address.split(',')[0]}`;
+  return '';
+}
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function timeAgo(d) {
+  if (!d) return 'unknown';
+  const days = Math.floor((Date.now()-new Date(d).getTime())/86400000);
+  if (days<1) return 'today'; if (days===1) return 'yesterday';
+  if (days<30) return `${days} days ago`;
+  const m = Math.floor(days/30); if (m<12) return `${m} month${m>1?'s':''} ago`;
+  const y = Math.floor(m/12); return `${y} year${y>1?'s':''} ago`;
+}
+
+// ── INIT ────────────────────────────────────────────────────
+document.getElementById('url-field').style.display = 'none';
+document.getElementById('address-field').style.display = 'none';
+document.getElementById('file-field').style.display = 'none';
+loadApproved();
+</script>
+</body>
+</html>

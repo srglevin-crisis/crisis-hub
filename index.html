@@ -7,152 +7,130 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root{
-  --bg:#f8fafc;--surf:#fff;--s2:#f1f5f9;--s3:#e2e8f0;
-  --bdr:#cbd5e1;--bdr2:#94a3b8;
-  --tx:#0f172a;--txm:#475569;--txh:#94a3b8;
-  --blue:#2563eb;--bl2:#dbeafe;--bl3:#bfdbfe;--bl4:#1d4ed8;
-  --sup:#d97706;--su2:#fef3c7;--su3:#fde68a;--su4:#92400e;
-  --red:#dc2626;--re2:#fee2e2;--re3:#fecaca;
-  --pur:#7c3aed;--pu2:#ede9fe;--pu3:#ddd6fe;
-  --pink:#db2777;--pk2:#fce7f3;
-  --nt:#1e293b;--nt2:#334155;
-  --r:12px;--rs:6px;
+  --bg:#f1f5f9;--surf:#fff;--s2:#e2e8f0;--s3:#cbd5e1;
+  --blue:#1e40af;--bl2:#dbeafe;--bl4:#1e3a8a;
+  --sup:#92400e;--su2:#fef3c7;--su4:#78350f;
+  --red:#b91c1c;--re2:#fee2e2;
+  --tx:#0f172a;--txm:#475569;
+  --r:10px;--rs:6px;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;min-height:100vh}
-.hdr{background:var(--surf);border-bottom:1px solid var(--bdr);padding:0 24px;display:flex;align-items:center;gap:20px;height:60px;position:sticky;top:0;z-index:300;box-shadow:0 1px 2px rgba(0,0,0,0.05)}
-.logo{font-size:16px;font-weight:800;letter-spacing:-.5px;color:var(--tx)}
-.logo em{color:var(--blue);font-style:normal}
-.tabs{display:flex;gap:4px;background:var(--s2);padding:4px;border-radius:var(--r)}
-.tb{padding:6px 16px;border:none;background:transparent;color:var(--txm);font-size:13px;font-weight:600;cursor:pointer;border-radius:var(--rs);transition:all .2s}
-.tb.a{background:var(--surf);color:var(--blue);box-shadow:0 2px 4px rgba(0,0,0,0.05)}
-.hdr-stats{margin-left:auto;display:flex;gap:16px;align-items:center}
-.hstat{font-size:12px;color:var(--txm)}
-.page{display:none;padding:24px;max-width:1200px;margin:0 auto;animation:fadeIn 0.3s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+body{background:var(--bg);color:var(--tx);font-size:14px;min-height:100vh}
+.hdr{background:#fff;border-bottom:1px solid var(--s3);padding:0 20px;display:flex;align-items:center;height:60px;position:sticky;top:0;z-index:100}
+.logo{font-weight:800;font-size:16px;color:var(--blue);margin-right:30px}
+.tabs{display:flex;gap:5px;background:var(--s2);padding:4px;border-radius:var(--r)}
+.tb{padding:6px 15px;border:none;background:transparent;font-weight:600;color:var(--txm);cursor:pointer;border-radius:var(--rs);transition:0.2s}
+.tb.a{background:#fff;color:var(--blue);box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+.page{display:none;padding:20px;max-width:1200px;margin:0 auto}
 .page.a{display:block}
-.srow{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-bottom:20px}
-.sc{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
-.sc-val{font-size:26px;font-weight:700;color:var(--tx)}
-.sc-lbl{font-size:11px;font-weight:600;color:var(--txm);text-transform:uppercase;letter-spacing:0.5px}
-.card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)}
-.cp{padding:20px}
-.tbar{display:flex;gap:12px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
-.tinput, .tsel, .fi{padding:8px 12px;border:1px solid var(--bdr);border-radius:var(--rs);font-size:13px;outline:none;transition:border-color 0.2s}
-.tinput:focus, .fi:focus{border-color:var(--blue);ring:2px var(--bl2)}
-.btn{padding:8px 16px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.card{background:#fff;border:1px solid var(--s3);border-radius:var(--r);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05);margin-bottom:20px}
+
+/* Editor Panel */
+.editor-panel{background:var(--bl2);border:2px solid var(--blue);border-radius:var(--r);padding:20px;margin-bottom:20px;display:none}
+.editor-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:15px;align-items:flex-end}
+.fi{width:100%;padding:8px;border:1px solid var(--s3);border-radius:var(--rs);outline:none}
+.day-toggles{display:flex;gap:4px;margin-top:10px}
+.dtg{width:32px;height:32px;border:1px solid var(--s3);background:#fff;cursor:pointer;border-radius:4px;font-weight:bold}
+.dtg.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* Heatmap */
+.hmgrid{display:grid;gap:2px;margin-top:10px;background:var(--s3);border:1px solid var(--s3);padding:2px;border-radius:4px}
+.hmcell{background:#fff;min-height:45px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;position:relative;transition:0.1s}
+.hmcell:hover{transform:scale(1.1);z-index:5;box-shadow:0 4px 8px rgba(0,0,0,0.2)}
+.hm-label{font-weight:bold;font-size:12px;display:flex;align-items:center;padding:5px}
+.hm-hr{text-align:center;font-size:10px;color:var(--txm);padding:5px 0}
+.sup-pip{position:absolute;top:2px;right:2px;width:6px;height:6px;background:var(--sup);border-radius:50%}
+
+/* Buttons */
+.btn{padding:8px 16px;border-radius:var(--rs);border:none;font-weight:600;cursor:pointer;transition:0.2s}
 .btn-p{background:var(--blue);color:#fff}
-.btn-p:hover{background:var(--bl4)}
-.btn-d{color:var(--red);border-color:var(--re3)}
-.btn-d:hover{background:var(--re2)}
+.btn-d{background:var(--re2);color:var(--red)}
+.btn-g{background:var(--s2);color:var(--txm)}
+
+/* Roster Table */
 .stable{width:100%;border-collapse:collapse}
-.stable th{padding:12px;text-align:left;font-size:11px;font-weight:700;color:var(--txm);text-transform:uppercase;background:var(--s2);border-bottom:1px solid var(--bdr)}
-.rw{display:flex;align-items:center;padding:10px 14px;gap:12px;cursor:pointer;transition:background .1s}
-.rw:hover{background:var(--s2)}
-.sname{font-weight:600;width:150px;font-size:14px}
-.dot{width:22px;height:22px;border-radius:4px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:transform 0.1s}
-.dot:hover{transform:scale(1.1)}
-.dot-on{background:var(--blue);color:#fff}
-.dot-son{background:var(--sup);color:#fff}
-.dot-off{background:var(--s3);color:var(--txh)}
-.dot-von{background:var(--red);color:#fff}
-.hmgrid{display:grid;gap:4px;margin-top:10px}
-.hmcell{border-radius:4px;cursor:pointer;position:relative;min-height:40px;transition:all 0.15s;border:1px solid transparent}
-.hmcell:hover{transform:scale(1.1);z-index:10;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1)}
-.critical{border:2px solid var(--red) !important; animation: pulse 2s infinite;}
-@keyframes pulse{0%{opacity:1}50%{opacity:0.6}100%{opacity:1}}
-.epanel{background:var(--bl2);padding:20px;display:none;border-bottom:1px solid var(--bl3)}
-.epanel.open{display:block}
-.addwrap{background:var(--su2);border:2px dashed var(--su3);border-radius:var(--r);padding:20px;margin-bottom:20px;display:none}
-.addwrap.open{display:block}
-.ttip{position:fixed;background:rgba(15,23,42,0.95);color:#fff;padding:12px;border-radius:8px;font-size:12px;pointer-events:none;z-index:9999;display:none;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1)}
+.stable th{text-align:left;padding:12px;border-bottom:2px solid var(--s2);color:var(--txm);font-size:12px;text-transform:uppercase}
+.stable td{padding:12px;border-bottom:1px solid var(--s2)}
+.sup-row{border-left:4px solid var(--sup)}
 </style>
 </head>
 <body>
 
 <header class="hdr">
-  <div class="logo">PCL <em>Crisis Staffing</em></div>
+  <div class="logo">PCL Staffing Manager</div>
   <div class="tabs">
-    <button class="tb a" onclick="goTab('roster')">Roster</button>
-    <button class="tb" onclick="goTab('heatmap')">Heatmap</button>
-    <button class="tb" onclick="goTab('dayview')">Visual Timeline</button>
+    <button class="tb a" onclick="goTab('dayview')">Day View</button>
+    <button class="tb" onclick="goTab('heatmap')">Week Heatmap</button>
+    <button class="tb" onclick="goTab('roster')">Roster</button>
   </div>
-  <div class="hdr-stats" id="hdrStats"></div>
 </header>
 
-<div class="page a" id="page-roster">
-  <div class="srow" id="rsRow"></div>
-  
-  <div class="addwrap" id="addWrap">
-    <h3 style="margin-bottom:15px">Add New Staff Member</h3>
-    <div style="display:flex;flex-wrap:wrap;gap:15px">
-      <input class="fi" id="aName" placeholder="Name">
-      <select class="fi" id="aShift">
+<div class="page a" id="page-dayview">
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+            <h2>Visual Timeline</h2>
+            <div id="daySelector" style="display:flex; gap:5px"></div>
+        </div>
+        <div style="height:400px"><canvas id="dvChart"></canvas></div>
+    </div>
+</div>
+
+<div class="page" id="page-heatmap">
+  <div class="card">
+    <h2>Coverage Heatmap</h2>
+    <p style="color:var(--txm); margin-bottom:15px">Numbers indicate total staff. Orange dots indicate a Supervisor is on duty.</p>
+    <div class="hmgrid" id="hmGrid"></div>
+  </div>
+</div>
+
+<div class="page" id="page-roster">
+  <div class="editor-panel" id="editorPanel">
+    <h3 id="editorTitle" style="margin-bottom:15px">Add Staff Member</h3>
+    <input type="hidden" id="eId">
+    <div class="editor-grid">
+      <div><label>Name</label><input class="fi" id="eName" placeholder="Full Name"></div>
+      <div><label>Role</label><select class="fi" id="eRole"><option value="CC">Counselor (CC)</option><option value="CCS">Supervisor (CCS)</option></select></div>
+      <div><label>Shift</label><select class="fi" id="eShift">
         <option>Day</option><option>Day Bridge</option><option>Evening</option><option>Eve Bridge</option><option>Overnight</option>
-      </select>
-      <input class="fi" id="aStart" type="time" value="08:00">
-      <input class="fi" id="aEnd" type="time" value="16:30">
-      <label><input type="checkbox" id="aSup"> Supervisor (CCS)</label>
-      <button class="btn btn-p" onclick="commitAdd()">Save to Roster</button>
-      <button class="btn btn-g" onclick="cancelAdd()">Cancel</button>
+      </select></div>
+      <div><label>Start Time (24h)</label><input class="fi" type="number" id="eStart" value="8" min="0" max="23"></div>
+      <div><label>End Time (24h)</label><input class="fi" type="number" id="eEnd" value="16" min="0" max="48"></div>
+    </div>
+    <div class="day-toggles" id="eDays"></div>
+    <div style="margin-top:20px; display:flex; gap:10px">
+      <button class="btn btn-p" onclick="saveStaff()">Save Changes</button>
+      <button class="btn btn-g" onclick="closeEditor()">Cancel</button>
     </div>
   </div>
 
-  <div class="tbar">
-    <input class="tinput" id="srch" placeholder="Search staff..." oninput="renderRoster()">
-    <button class="btn btn-p" style="margin-left:auto" onclick="openAdd()">+ Add Staff</button>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
+    <h2>Current Roster</h2>
+    <button class="btn btn-p" onclick="openEditor()">+ Add Staff</button>
   </div>
 
   <div class="card">
     <table class="stable">
       <thead>
-        <tr><th style="padding-left:14px">Staff Info</th><th>Shift</th><th>Hours</th><th>Schedule (M-S)</th><th>Actions</th></tr>
+        <tr><th>Name</th><th>Role</th><th>Shift</th><th>Hours</th><th>Schedule</th><th>Actions</th></tr>
       </thead>
-      <tbody id="staffBody"></tbody>
+      <tbody id="rosterBody"></tbody>
     </table>
   </div>
 </div>
 
-<div class="page" id="page-heatmap">
-  <div class="card cp">
-    <h2 style="margin-bottom:10px">Weekly Coverage Density</h2>
-    <p style="color:var(--txm);margin-bottom:20px">Red outlines indicate "Critical Low" staffing (less than 3 counselors).</p>
-    <div class="hmgrid" id="hmGrid"></div>
-    <div id="hmInfo" style="margin-top:20px; padding:15px; background:var(--s2); border-radius:8px; min-height:80px">
-      Hover over a cell to see shift details.
-    </div>
-  </div>
-</div>
-
-<div class="page" id="page-dayview">
-    <div class="card cp">
-        <div id="daySels" style="margin-bottom:20px; display:flex; gap:8px"></div>
-        <div style="height:400px; position:relative">
-            <canvas id="dvChart"></canvas>
-        </div>
-    </div>
-</div>
-
-<div class="ttip" id="ttip"></div>
-
 <script>
-// STORAGE KEYS
-const STORAGE_KEY = 'pcl_staffing_data_v4';
+const STORAGE_KEY = 'pcl_staffing_v5';
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const SHIFT_ORDER = ['Day','Day Bridge','Evening','Eve Bridge','Overnight'];
-
 let staff = [];
-let editId = null;
+let currentEditDays = [1,1,1,1,1,0,0];
+let selDay = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1; // Default to current day
+let dvChart = null;
 
-// Initialize Data from LocalStorage
-function loadData() {
+function init() {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-        staff = JSON.parse(saved);
-    } else {
-        // Fallback to empty or your default set
-        staff = []; 
-    }
+    staff = saved ? JSON.parse(saved) : [];
+    // Ensure "Day View" is selected visually in tabs and logically in JS
+    goTab('dayview'); 
 }
 
 function saveData() {
@@ -160,124 +138,174 @@ function saveData() {
     renderAll();
 }
 
-function renderAll() {
-    renderRoster();
-    if(document.getElementById('page-heatmap').classList.contains('a')) renderHeatmap();
-    if(document.getElementById('page-dayview').classList.contains('a')) renderDayView();
-}
-
-function renderRoster() {
-    const q = document.getElementById('srch').value.toLowerCase();
-    const body = document.getElementById('staffBody');
-    const filtered = staff.filter(s => s.n.toLowerCase().includes(q));
-
-    body.innerHTML = filtered.map(s => `
-        <tr style="border-bottom:1px solid var(--bdr)">
-            <td class="rw">
-                <div class="sname">${s.n} ${s.sup ? '⭐' : ''}</div>
-                <div style="font-size:10px; color:var(--txm)">${s.sup ? 'CCS' : 'CC'}</div>
-            </td>
-            <td><span style="padding:4px 8px; border-radius:4px; background:var(--bl2); color:var(--blue); font-size:12px; font-weight:600">${s.sh}</span></td>
-            <td>${s.s}:00 - ${s.e > 24 ? (s.e-24)+':00 (+1)' : s.e+':00'}</td>
-            <td>
-                <div style="display:flex; gap:3px">
-                    ${s.d.map((on, i) => `<div class="dot ${on ? (s.sup ? 'dot-son' : 'dot-on') : 'dot-off'}">${DAYS[i][0]}</div>`).join('')}
-                </div>
-            </td>
-            <td>
-                <button class="btn btn-d" onclick="deleteStaff('${s.id}')">Delete</button>
-            </td>
-        </tr>
-    `).join('');
-
-    // Update Header Stats
-    const total = staff.length;
-    const sups = staff.filter(x => x.sup).length;
-    document.getElementById('hdrStats').innerHTML = `<div class="hstat"><b>${total}</b> Total Staff | <b>${sups}</b> Supervisors</div>`;
-}
-
-function openAdd() { document.getElementById('addWrap').style.display = 'block'; }
-function cancelAdd() { document.getElementById('addWrap').style.display = 'none'; }
-
-function commitAdd() {
-    const name = document.getElementById('aName').value;
-    if(!name) return alert("Name required");
+// EDITOR LOGIC
+function openEditor(id = null) {
+    const panel = document.getElementById('editorPanel');
+    panel.style.display = 'block';
     
-    const newStaff = {
-        id: 'st-' + Date.now(),
+    if (id) {
+        const s = staff.find(x => x.id === id);
+        document.getElementById('editorTitle').innerText = "Edit " + s.n;
+        document.getElementById('eId').value = s.id;
+        document.getElementById('eName').value = s.n;
+        document.getElementById('eRole').value = s.sup ? "CCS" : "CC";
+        document.getElementById('eShift').value = s.sh;
+        document.getElementById('eStart').value = s.s;
+        document.getElementById('eEnd').value = s.e;
+        currentEditDays = [...s.d];
+    } else {
+        document.getElementById('editorTitle').innerText = "Add Staff Member";
+        document.getElementById('eId').value = "";
+        document.getElementById('eName').value = "";
+        currentEditDays = [1,1,1,1,1,0,0];
+    }
+    renderDayToggles();
+}
+
+function closeEditor() { document.getElementById('editorPanel').style.display = 'none'; }
+
+function renderDayToggles() {
+    const container = document.getElementById('eDays');
+    container.innerHTML = DAYS.map((day, i) => 
+        `<button class="dtg ${currentEditDays[i] ? 'on' : ''}" onclick="toggleDay(${i})">${day[0]}</button>`
+    ).join('');
+}
+
+function toggleDay(i) {
+    currentEditDays[i] = currentEditDays[i] ? 0 : 1;
+    renderDayToggles();
+}
+
+function saveStaff() {
+    const id = document.getElementById('eId').value;
+    const name = document.getElementById('eName').value;
+    if (!name) return alert("Name is required");
+
+    const data = {
+        id: id || "st-" + Date.now(),
         n: name,
-        sh: document.getElementById('aShift').value,
-        s: parseInt(document.getElementById('aStart').value),
-        e: parseInt(document.getElementById('aEnd').value),
-        sup: document.getElementById('aSup').checked,
-        d: [1,1,1,1,1,0,0] // Default Mon-Fri
+        sup: document.getElementById('eRole').value === "CCS",
+        sh: document.getElementById('eShift').value,
+        s: parseInt(document.getElementById('eStart').value),
+        e: parseInt(document.getElementById('eEnd').value),
+        d: [...currentEditDays]
     };
-    
-    staff.push(newStaff);
+
+    if (id) {
+        const idx = staff.findIndex(x => x.id === id);
+        staff[idx] = data;
+    } else {
+        staff.push(data);
+    }
+
     saveData();
-    cancelAdd();
+    closeEditor();
 }
 
 function deleteStaff(id) {
-    if(confirm("Remove this staff member?")) {
-        staff = staff.filter(s => s.id !== id);
+    if (confirm("Permanently remove this staff member?")) {
+        staff = staff.filter(x => x.id !== id);
         saveData();
     }
 }
 
+// RENDERING
+function renderAll() {
+    renderRoster();
+    renderHeatmap();
+    renderDayView();
+}
+
+function renderRoster() {
+    const body = document.getElementById('rosterBody');
+    body.innerHTML = staff.map(s => `
+        <tr class="${s.sup ? 'sup-row' : ''}">
+            <td><strong>${s.n}</strong></td>
+            <td>${s.sup ? 'CCS (Supervisor)' : 'CC (Counselor)'}</td>
+            <td>${s.sh}</td>
+            <td>${s.s}:00 - ${s.e > 24 ? (s.e-24)+':00 (+1)' : s.e+':00'}</td>
+            <td>${s.d.map((on, i) => on ? DAYS[i][0] : '-').join(' ')}</td>
+            <td>
+                <button class="btn btn-g" onclick="openEditor('${s.id}')">Edit</button>
+                <button class="btn btn-d" onclick="deleteStaff('${s.id}')">Delete</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
 function renderHeatmap() {
     const grid = document.getElementById('hmGrid');
-    grid.style.gridTemplateColumns = '60px repeat(24, 1fr)';
+    grid.style.gridTemplateColumns = '80px repeat(24, 1fr)';
     let html = '<div></div>';
-    for(let i=0; i<24; i++) html += `<div style="text-align:center; font-size:10px; color:var(--txh)">${i}h</div>`;
+    for(let h=0; h<24; h++) html += `<div class="hm-hr">${h}h</div>`;
 
     for(let d=0; d<7; d++) {
-        html += `<div style="font-weight:700; display:flex; align-items:center">${DAYS[d]}</div>`;
+        html += `<div class="hm-label">${DAYS[d]}</div>`;
         for(let h=0; h<24; h++) {
-            const onDuty = staff.filter(s => {
-                const dayMatch = s.d[d] === 1;
-                const hourMatch = h >= s.s && h < s.e;
-                return dayMatch && hourMatch;
-            });
+            const onDuty = staff.filter(s => s.d[d] === 1 && h >= s.s && h < s.e);
             const count = onDuty.length;
-            const alpha = Math.min(count / 10, 1);
-            const isCritical = count > 0 && count < 3;
-            const bgColor = count === 0 ? 'var(--s3)' : `rgba(37, 99, 235, ${alpha})`;
+            const hasSup = onDuty.some(s => s.sup);
+            const alpha = Math.min(count / 12, 1);
+            const bg = count === 0 ? '#fff' : `rgba(30, 64, 175, ${alpha})`;
+            const textColor = alpha > 0.5 ? '#fff' : 'var(--tx)';
             
-            html += `<div class="hmcell ${isCritical ? 'critical' : ''}" 
-                        style="background:${bgColor}" 
-                        onmouseover="showCellDetails(${d}, ${h})"
-                        onmouseleave="hideTT()">
-                     </div>`;
+            html += `<div class="hmcell" style="background:${bg}; color:${textColor}">
+                ${count > 0 ? count : ''}
+                ${hasSup ? '<div class="sup-pip"></div>' : ''}
+            </div>`;
         }
     }
     grid.innerHTML = html;
 }
 
-function showCellDetails(d, h) {
-    const onDuty = staff.filter(s => s.d[d] === 1 && h >= s.s && h < s.e);
-    const info = document.getElementById('hmInfo');
-    if(onDuty.length === 0) {
-        info.innerHTML = `<strong>${DAYS[d]} at ${h}:00</strong>: No staff scheduled.`;
-        return;
-    }
-    info.innerHTML = `<strong>${DAYS[d]} at ${h}:00</strong> (${onDuty.length} active):<br>` + 
-                     onDuty.map(s => `${s.sup ? '⭐' : ''} ${s.n} (${s.sh})`).join(', ');
+function renderDayView() {
+    const selector = document.getElementById('daySelector');
+    selector.innerHTML = DAYS.map((d, i) => 
+        `<button class="tb ${i === selDay ? 'a' : ''}" onclick="selDay=${i};renderDayView()">${d}</button>`
+    ).join('');
+
+    const ctx = document.getElementById('dvChart').getContext('2d');
+    const labels = Array.from({length: 24}, (_, i) => i + ":00");
+    const ccData = labels.map((_, h) => staff.filter(s => s.d[selDay] === 1 && !s.sup && h >= s.s && h < s.e).length);
+    const supData = labels.map((_, h) => staff.filter(s => s.d[selDay] === 1 && s.sup && h >= s.s && h < s.e).length);
+
+    if (dvChart) dvChart.destroy();
+    dvChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'CCS (Supervisors)', data: supData, backgroundColor: '#92400e' },
+                { label: 'CC (Counselors)', data: ccData, backgroundColor: '#1e40af' }
+            ]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { position: 'bottom' } },
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } } } 
+        }
+    });
 }
 
 function goTab(t) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('a'));
     document.querySelectorAll('.tb').forEach(b => b.classList.remove('a'));
+    
     document.getElementById('page-' + t).classList.add('a');
-    event.currentTarget.classList.add('a');
+    
+    // Find the button and add the active class
+    const buttons = document.querySelectorAll('.tb');
+    buttons.forEach(btn => {
+        if(btn.innerText.toLowerCase().includes(t.replace('view','').replace('roster','roster').replace('heatmap','heatmap'))) {
+            btn.classList.add('a');
+        }
+    });
+    
     renderAll();
 }
 
-function hideTT() { document.getElementById('ttip').style.display = 'none'; }
-
-// Run on start
-loadData();
-renderAll();
+init();
 </script>
 </body>
 </html>
